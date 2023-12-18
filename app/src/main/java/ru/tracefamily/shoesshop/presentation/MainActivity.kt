@@ -43,7 +43,7 @@ class MainActivity() : ComponentActivity() {
         Text(text = card.value.name)
 
         Button(onClick = {
-
+            mainViewModel.scanBarcode()
         }) {
             Text(text = "Press me")
         }
