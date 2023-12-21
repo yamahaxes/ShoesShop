@@ -10,10 +10,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ru.tracefamily.shoesshop.domain.repo.ApiInfoServiceRepo
+import ru.tracefamily.shoesshop.domain.common.model.ConnectSettings
 import ru.tracefamily.shoesshop.domain.repo.BarcodeScannerRepo
-import ru.tracefamily.shoesshop.repo.ApiInfoServiceRepoImpl
-import ru.tracefamily.shoesshop.repo.BarcodeScannerRepoImpl
+import ru.tracefamily.shoesshop.domain.repo.InfoRepo
+import ru.tracefamily.shoesshop.repository.BarcodeScannerRepoImpl
+import ru.tracefamily.shoesshop.repository.InfoRepoImpl
 import javax.inject.Singleton
 
 @Module
@@ -22,11 +23,18 @@ object RepoModule {
 
     @Provides
     @Singleton
-    fun provideApiInfoServiceRepo() : ApiInfoServiceRepo = ApiInfoServiceRepoImpl()
+    fun provideApiInfoServiceRepo(): InfoRepo = InfoRepoImpl(
+        ConnectSettings(
+            serverAddress = "http://193.218.144.192/retail_storage1/",
+            username = "Администратор",
+            password = "24681357"
+        )
+    )
 
     @Provides
     @Singleton
-    fun provideScannerRepo(scanner: GmsBarcodeScanner): BarcodeScannerRepo = BarcodeScannerRepoImpl(scanner)
+    fun provideScannerRepo(scanner: GmsBarcodeScanner): BarcodeScannerRepo =
+        BarcodeScannerRepoImpl(scanner)
 
     @Singleton
     @Provides

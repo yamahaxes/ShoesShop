@@ -1,4 +1,4 @@
-package ru.tracefamily.shoesshop.repo
+package ru.tracefamily.shoesshop.repository
 
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import kotlinx.coroutines.channels.awaitClose
