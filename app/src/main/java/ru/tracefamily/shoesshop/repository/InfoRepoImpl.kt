@@ -18,9 +18,11 @@ import ru.tracefamily.shoesshop.domain.repo.InfoRepo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.ApiInfoService
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CardInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CommonStocksRowInfo
+import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.ImageInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksCellInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksRowInfo
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -74,7 +76,9 @@ class InfoRepoImpl @Inject constructor(override val connectSettings: ConnectSett
     private fun getInstance(): Retrofit {
         val interceptor = HttpLoggingInterceptor()
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        val client = OkHttpClient.Builder().addInterceptor(interceptor).build()
+        val client =
+            OkHttpClient.Builder().addInterceptor(interceptor).readTimeout(15, TimeUnit.SECONDS)
+                .build()
 
         return Retrofit.Builder()
             .baseUrl(connectSettings.serverAddress)
@@ -97,8 +101,8 @@ class InfoRepoImpl @Inject constructor(override val connectSettings: ConnectSett
 fun CardInfo.toCard(): Card =
     Card(name = name, price = price, priceBeforeDiscount = priceBeforeDiscount)
 
-fun String.toImage(): Image =
-    Image(toString())
+fun ImageInfo.toImage(): Image =
+    Image(base64Value = base64Value)
 
 fun StocksInfo.toStocks(): Stocks =
     Stocks(
