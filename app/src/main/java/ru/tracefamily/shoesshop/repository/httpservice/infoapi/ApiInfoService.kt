@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CardInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CommonStocksRowInfo
+import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CommonStocksInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.ImageInfo
 import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksInfo
 
@@ -33,6 +33,6 @@ interface ApiInfoService {
     suspend fun getCommonStocks(
         @Header("Authorization") credentials: String,
         @Path("barcode") barcode: String
-    ): Response<List<CommonStocksRowInfo>>
+    ): Response<CommonStocksInfo>
 
 }

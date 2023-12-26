@@ -9,9 +9,7 @@ import javax.inject.Inject
 @ViewModelScoped
 class GetStocksUseCase @Inject constructor(
     private val apiInfo: InfoRepo
-): UseCaseExecutable<Stocks> {
-    override suspend fun execute(barcode: Barcode): Result<Stocks> {
-        TODO()
-    }
+) : UseCaseExecutable<Stocks> {
 
+    override suspend fun execute(barcode: Barcode): Result<Stocks> = apiInfo.getStocks(barcode)
 }

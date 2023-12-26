@@ -3,4 +3,24 @@
 
     <string name="bottom_bar_label_product_info">Info</string>
     <string name="bottom_bar_label_warehouse_management">Warehouse</string>
+
+    // Labels
+    <string name="FieldLabelName">Name</string>
+    <string name="FieldLabelBarcode">Barcode</string>
+    <string name="LabelLeftoversInTheStore">Leftovers in the store</string>
+    <string name="LabelColumnSize">Size</string>
+    <string name="LabelColumnQuantity">Quantity</string>
+    <string name="LabelColumnCell">Cell</string>
+    <string name="LabelMissing">Missing</string>
+    <string name="LabelShoppingLeftovers">Shopping leftovers\t</string>
+
+    // Abbreviations
+    <string name="RubleAbbreviation">rub</string>
+    <string name="PieceAbbreviation">pc</string>
+
+    // User messages
+    <string name="MessageCardNotFoundByBarcode">The card was not found by barcode</string>
+    <string name="MessageTheCardNotFoundByBarcode">The card was not found by barcode</string>
+    <string name="MessageErrorReceiptCardWithCodeError">"Card receipt error. Code: "</string>
+
 </resources>

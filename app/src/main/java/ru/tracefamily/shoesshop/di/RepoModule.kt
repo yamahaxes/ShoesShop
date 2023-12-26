@@ -23,12 +23,12 @@ object RepoModule {
 
     @Provides
     @Singleton
-    fun provideApiInfoServiceRepo(): InfoRepo = InfoRepoImpl(
+    fun provideApiInfoServiceRepo(context: Context): InfoRepo = InfoRepoImpl(
         ConnectSettings(
             serverAddress = "http://193.218.144.192/retail_storage1/",
             username = "Администратор",
-            password = "24681357"
-        )
+            password = "24681357",
+        ), context
     )
 
     @Provides

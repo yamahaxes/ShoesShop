@@ -9,9 +9,7 @@ import javax.inject.Inject
 @ViewModelScoped
 class GetImageUseCase @Inject constructor(
     private val apiRepo: InfoRepo
-): UseCaseExecutable<Image> {
-    override suspend fun execute(barcode: Barcode): Result<Image> {
-        return apiRepo.getImage(barcode)
-    }
+) : UseCaseExecutable<Image> {
 
+    override suspend fun execute(barcode: Barcode): Result<Image> = apiRepo.getImage(barcode)
 }

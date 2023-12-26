@@ -9,10 +9,7 @@ import javax.inject.Inject
 @ViewModelScoped
 class GetCardUseCase @Inject constructor(
     private val apiRepo: InfoRepo
-): UseCaseExecutable<Card> {
+) : UseCaseExecutable<Card> {
 
-    override suspend fun execute(barcode: Barcode): Result<Card> {
-        return apiRepo.getCard(barcode)
-    }
-
+    override suspend fun execute(barcode: Barcode): Result<Card> = apiRepo.getCard(barcode)
 }

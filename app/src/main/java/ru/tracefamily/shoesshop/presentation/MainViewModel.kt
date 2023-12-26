@@ -2,7 +2,6 @@ package ru.tracefamily.shoesshop.presentation
 
 import android.media.AudioManager
 import android.media.ToneGenerator
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,18 +30,16 @@ class MainViewModel @Inject constructor(
     private val getStocksUseCase: GetStocksUseCase,
 ) : ViewModel() {
 
-    private val tagLog: String = "MainViewModel"
-
     // Info block, card state
-    private val _cardState = MutableStateFlow(Card(""))
+    private val _cardState = MutableStateFlow(Card.empty())
     val cardState = _cardState.asStateFlow()
 
     // Info block, image state
-    private val _imageState = MutableStateFlow(Image(""))
+    private val _imageState = MutableStateFlow(Image.empty())
     val imageState = _imageState.asStateFlow()
 
     // Info block, stocks state
-    private val _stocksState = MutableStateFlow(Stocks(listOf(), listOf()))
+    private val _stocksState = MutableStateFlow(Stocks.empty())
     val stocksState = _stocksState.asStateFlow()
 
     // Info block, common stocks state
@@ -69,19 +66,18 @@ class MainViewModel @Inject constructor(
     private suspend fun updateInfoState(barcode: Barcode) {
 
         // default values
-        _cardState.value = Card("")
-        _imageState.value = Image("")
-        _stocksState.value = Stocks(listOf(), listOf())
+        _cardState.value = Card.empty()
+        _imageState.value = Image.empty()
+        _stocksState.value = Stocks.empty()
         _commonStocksState.value = listOf()
 
         try {
             _cardState.value = getCardUseCase.execute(barcode).getOrThrow()
             _imageState.value = getImageUseCase.execute(barcode).getOrThrow()
-            //_stocksState.value = getStocksUseCase.execute(barcode).getOrThrow()
-            //_commonStocksState.value = getCommonStocksUseCase.execute(barcode).getOrThrow()
+            _stocksState.value = getStocksUseCase.execute(barcode).getOrThrow()
+            _commonStocksState.value = getCommonStocksUseCase.execute(barcode).getOrThrow()
         } catch (e: Throwable) {
             _errorMessageState.value = ErrorState(e.message.toString())
-            Log.d("MyLog", e.message.toString())
         }
     }
 
