@@ -30,6 +30,10 @@ class MainViewModel @Inject constructor(
     private val getStocksUseCase: GetStocksUseCase,
 ) : ViewModel() {
 
+    // Info block, state loading
+    private val _loadingInfo = MutableStateFlow(false)
+    val loadingInfo = _loadingInfo.asStateFlow()
+
     // Info block, card state
     private val _cardState = MutableStateFlow(Card.empty())
     val cardState = _cardState.asStateFlow()
@@ -65,6 +69,8 @@ class MainViewModel @Inject constructor(
 
     private suspend fun updateInfoState(barcode: Barcode) {
 
+        _loadingInfo.value = true
+
         // default values
         _cardState.value = Card.empty()
         _imageState.value = Image.empty()
@@ -79,6 +85,8 @@ class MainViewModel @Inject constructor(
         } catch (e: Throwable) {
             _errorMessageState.value = ErrorState(e.message.toString())
         }
+
+        _loadingInfo.value = false
     }
 
     fun confirmErrors() {

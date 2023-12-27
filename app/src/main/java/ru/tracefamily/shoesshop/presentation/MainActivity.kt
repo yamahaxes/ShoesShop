@@ -61,6 +61,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import dagger.hilt.android.AndroidEntryPoint
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.presentation.theme.ShoesShopTheme
@@ -157,10 +161,18 @@ class MainActivity() : ComponentActivity() {
     @Composable
     private fun InfoScreen() {
         val stateScroll = rememberScrollState()
-
+        val stateLoading by vm.loadingInfo.collectAsState()
+        val composition by rememberLottieComposition(spec = LottieCompositionSpec.Asset("loading.json"))
         Column(
             modifier = Modifier.verticalScroll(stateScroll)
         ) {
+            if (stateLoading) {
+                LottieAnimation(
+                    modifier = Modifier.fillMaxWidth(),
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever,
+                    )
+            }
             ImageBlock(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -180,7 +192,8 @@ class MainActivity() : ComponentActivity() {
             CommonStocksBlock(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp))
+                    .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp)
+            )
         }
     }
 
