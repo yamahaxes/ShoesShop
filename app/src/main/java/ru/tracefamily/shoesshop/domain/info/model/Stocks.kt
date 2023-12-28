@@ -1,10 +1,6 @@
 package ru.tracefamily.shoesshop.domain.info.model
 
 data class Stocks(
-    val rows: List<StocksRow>,
-    val cells: List<StocksCell>
-) {
-    companion object {
-        fun empty(): Stocks = Stocks(listOf(), listOf())
-    }
-}
+    val rows: List<StocksRow> = listOf(),
+    val cells: List<StocksCell> = listOf()
+)

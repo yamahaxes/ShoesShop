@@ -1,16 +1,13 @@
 package ru.tracefamily.shoesshop.domain.repo
 
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
-import ru.tracefamily.shoesshop.domain.common.model.ConnectSettings
 import ru.tracefamily.shoesshop.domain.info.model.Card
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocksRow
 import ru.tracefamily.shoesshop.domain.info.model.Image
 import ru.tracefamily.shoesshop.domain.info.model.Stocks
 
-interface InfoRepo {
+interface InfoRepo: Repo {
 
-    val connectSettings: ConnectSettings
-    
     suspend fun getCard(barcode: Barcode): Result<Card>
     suspend fun getImage(barcode: Barcode): Result<Image>
     suspend fun getStocks(barcode: Barcode): Result<Stocks>

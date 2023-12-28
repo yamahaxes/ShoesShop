@@ -35,15 +35,15 @@ class MainViewModel @Inject constructor(
     val loadingInfo = _loadingInfo.asStateFlow()
 
     // Info block, card state
-    private val _cardState = MutableStateFlow(Card.empty())
+    private val _cardState = MutableStateFlow(Card())
     val cardState = _cardState.asStateFlow()
 
     // Info block, image state
-    private val _imageState = MutableStateFlow(Image.empty())
+    private val _imageState = MutableStateFlow(Image())
     val imageState = _imageState.asStateFlow()
 
     // Info block, stocks state
-    private val _stocksState = MutableStateFlow(Stocks.empty())
+    private val _stocksState = MutableStateFlow(Stocks())
     val stocksState = _stocksState.asStateFlow()
 
     // Info block, common stocks state
@@ -61,20 +61,20 @@ class MainViewModel @Inject constructor(
                     val tone = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                     tone.startTone(ToneGenerator.TONE_SUP_PIP, 150)
 
-                    updateInfoState(barcode)
+                    updateInfoStates(barcode)
                 }
             }
         }
     }
 
-    private suspend fun updateInfoState(barcode: Barcode) {
+    private suspend fun updateInfoStates(barcode: Barcode) {
 
         _loadingInfo.value = true
 
         // default values
-        _cardState.value = Card.empty()
-        _imageState.value = Image.empty()
-        _stocksState.value = Stocks.empty()
+        _cardState.value = Card()
+        _imageState.value = Image()
+        _stocksState.value = Stocks()
         _commonStocksState.value = listOf()
 
         try {

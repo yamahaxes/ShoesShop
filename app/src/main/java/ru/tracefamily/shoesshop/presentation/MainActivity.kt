@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -153,46 +154,66 @@ class MainActivity() : ComponentActivity() {
 
     @Composable
     private fun ScanBarcodeButton() {
-        FloatingActionButton(onClick = { vm.scanBarcode() }) {
-            Text(text = "Scan") // DEBUG
+        FloatingActionButton(
+            onClick = { vm.scanBarcode() }
+        ) {
+            Icon(
+                modifier = Modifier.padding(5.dp),
+                painter = painterResource(id = R.drawable.ic_camera_float_button),
+                contentDescription = null,
+            )
         }
     }
 
     @Composable
     private fun InfoScreen() {
         val stateScroll = rememberScrollState()
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier.verticalScroll(stateScroll)
+            ) {
+                ImageBlock(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 15.dp, end = 15.dp, top = 15.dp)
+                        .height(150.dp)
+                )
+                CardBlock(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 15.dp, end = 15.dp, top = 15.dp)
+                )
+                StocksBlock(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 15.dp)
+                )
+                CommonStocksBlock(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp)
+                )
+            }
+            LoadingInfo(modifier = Modifier
+                .fillMaxSize()
+                .height(200.dp))
+        }
+    }
+
+    @Composable
+    private fun LoadingInfo(modifier: Modifier) {
         val stateLoading by vm.loadingInfo.collectAsState()
         val composition by rememberLottieComposition(spec = LottieCompositionSpec.Asset("loading.json"))
-        Column(
-            modifier = Modifier.verticalScroll(stateScroll)
-        ) {
-            if (stateLoading) {
-                LottieAnimation(
-                    modifier = Modifier.fillMaxWidth(),
-                    composition = composition,
-                    iterations = LottieConstants.IterateForever,
-                    )
-            }
-            ImageBlock(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp, top = 15.dp)
-                    .height(150.dp)
-            )
-            CardBlock(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp, top = 15.dp)
-            )
-            StocksBlock(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 15.dp)
-            )
-            CommonStocksBlock(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp)
+
+        if (stateLoading) {
+            LottieAnimation(
+                modifier = modifier,
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
             )
         }
     }

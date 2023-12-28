@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Магазин обуви</string>
+    <string name="bottom_bar_label_product_info">Инфо</string>
+    <string name="bottom_bar_label_warehouse_management">Склад</string>
+    <string name="FieldLabelName">Наименование</string>
+    <string name="FieldLabelBarcode">Штрихкод</string>
+    <string name="LabelLeftoversInTheStore">Остатки в магазине</string>
+    <string name="LabelColumnSize">Размер</string>
+    <string name="LabelColumnQuantity">Количество</string>
+    <string name="LabelColumnCell">Ячейка</string>
+    <string name="LabelMissing">Отсутствует</string>
+    <string name="LabelShoppingLeftovers">Остатки магазинов</string>
+    <string name="RubleAbbreviation">р.</string>
+    <string name="PieceAbbreviation">шт.</string>
+    <string name="MessageTheCardNotFoundByBarcode">Карточка не найдена по штрихкоду</string>
+    <string name="MessageErrorReceiptCardWithCodeError">Ошибка получение карточки. Код ошибки:</string>
+</resources>

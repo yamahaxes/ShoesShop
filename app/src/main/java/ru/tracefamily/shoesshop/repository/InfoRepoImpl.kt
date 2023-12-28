@@ -32,7 +32,7 @@ import javax.inject.Inject
 @ServiceScoped
 class InfoRepoImpl @Inject constructor(
     override val connectSettings: ConnectSettings,
-    val context: Context
+    private val context: Context
 ) : InfoRepo {
 
     override suspend fun getCard(barcode: Barcode): Result<Card> {
@@ -45,7 +45,7 @@ class InfoRepoImpl @Inject constructor(
                 if (body != null) {
                     Result.success(body.toCard().copy(barcode = barcode))
                 } else {
-                    Result.success(Card.empty().copy(barcode = barcode))
+                    Result.success(Card().copy(barcode = barcode))
                 }
             } else if (result.code() == HttpURLConnection.HTTP_NO_CONTENT) {
                 Result.failure(Throwable(context.getString(R.string.MessageTheCardNotFoundByBarcode)))
@@ -65,7 +65,7 @@ class InfoRepoImpl @Inject constructor(
             return if (body != null) {
                 Result.success(body.toImage())
             } else {
-                Result.success(Image.empty())
+                Result.success(Image())
             }
 
         }
@@ -81,7 +81,7 @@ class InfoRepoImpl @Inject constructor(
             return if (body != null) {
                 Result.success(body.toStocks())
             } else {
-                Result.success(Stocks.empty())
+                Result.success(Stocks())
             }
         }
         return Result.failure(Throwable(result.message()))
@@ -132,7 +132,7 @@ fun CardInfo.toCard(): Card =
         name = name,
         price = price,
         priceBeforeDiscount = priceBeforeDiscount,
-        barcode = Barcode.empty()
+        barcode = Barcode()
     )
 
 fun ImageInfo.toImage(): Image =

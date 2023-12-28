@@ -19,7 +19,6 @@
     <string name="PieceAbbreviation">pc</string>
 
     // User messages
-    <string name="MessageCardNotFoundByBarcode">The card was not found by barcode</string>
     <string name="MessageTheCardNotFoundByBarcode">The card was not found by barcode</string>
     <string name="MessageErrorReceiptCardWithCodeError">"Card receipt error. Code: "</string>
 
