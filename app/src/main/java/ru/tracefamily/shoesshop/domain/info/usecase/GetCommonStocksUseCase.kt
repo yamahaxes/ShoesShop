@@ -13,6 +13,9 @@ class GetCommonStocksUseCase @Inject constructor(
 ) : UseCaseExecutable<Barcode, List<CommonStocksRow>> {
 
     override suspend fun execute(input: Barcode): Result<List<CommonStocksRow>> =
-        apiRepo.getCommonStocks(input)
-
+        try {
+            Result.success(apiRepo.getCommonStocks(input))
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
 }

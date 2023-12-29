@@ -2,10 +2,10 @@ package ru.tracefamily.shoesshop.domain.repo
 
 import ru.tracefamily.shoesshop.domain.warehouse.model.Document
 
-interface WarehouseRepo: Repo {
+interface WarehouseRepo {
 
-    fun getDrafts(): List<Document>
+    suspend fun getDrafts(): List<Document>
 
-    fun postDocument(document: Document): Document
+    suspend fun postDocument(document: Document): Document
 
 }

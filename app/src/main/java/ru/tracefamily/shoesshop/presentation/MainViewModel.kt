@@ -5,6 +5,10 @@ import android.media.ToneGenerator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,7 +22,11 @@ import ru.tracefamily.shoesshop.domain.info.usecase.GetCommonStocksUseCase
 import ru.tracefamily.shoesshop.domain.info.usecase.GetImageUseCase
 import ru.tracefamily.shoesshop.domain.info.usecase.GetStocksUseCase
 import ru.tracefamily.shoesshop.domain.repo.BarcodeScannerRepo
-import ru.tracefamily.shoesshop.presentation.states.ErrorState
+import ru.tracefamily.shoesshop.domain.warehouse.model.DocType
+import ru.tracefamily.shoesshop.domain.warehouse.model.Document
+import ru.tracefamily.shoesshop.domain.warehouse.usecase.GetDraftsUseCase
+import ru.tracefamily.shoesshop.domain.warehouse.usecase.PostDocumentUseCase
+import ru.tracefamily.shoesshop.presentation.state.ErrorState
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +36,8 @@ class MainViewModel @Inject constructor(
     private val getImageUseCase: GetImageUseCase,
     private val getCommonStocksUseCase: GetCommonStocksUseCase,
     private val getStocksUseCase: GetStocksUseCase,
+    private val getDraftsUseCase: GetDraftsUseCase,
+    private val postDocumentUseCase: PostDocumentUseCase
 ) : ViewModel() {
 
     // Info block, state loading
@@ -49,6 +59,10 @@ class MainViewModel @Inject constructor(
     // Info block, common stocks state
     private val _commonStocksState = MutableStateFlow<List<CommonStocksRow>>(listOf())
     val commonStocksState = _commonStocksState.asStateFlow()
+
+    // Warehouse block, drafts list state
+    private val _draftsListState = MutableStateFlow<List<Document>>(listOf())
+    val draftsListState = _draftsListState.asStateFlow()
 
     // If get error
     private val _errorMessageState = MutableStateFlow(ErrorState())
@@ -78,10 +92,12 @@ class MainViewModel @Inject constructor(
         _commonStocksState.value = listOf()
 
         try {
-            _cardState.value = getCardUseCase.execute(barcode).getOrThrow()
-            _imageState.value = getImageUseCase.execute(barcode).getOrThrow()
-            _stocksState.value = getStocksUseCase.execute(barcode).getOrThrow()
-            _commonStocksState.value = getCommonStocksUseCase.execute(barcode).getOrThrow()
+            coroutineScope {
+                _cardState.value = async { getCardUseCase.execute(barcode) }.await().getOrThrow()
+                _imageState.value = getImageUseCase.execute(barcode).getOrThrow()
+                _stocksState.value = getStocksUseCase.execute(barcode).getOrThrow()
+                _commonStocksState.value = getCommonStocksUseCase.execute(barcode).getOrThrow()
+            }
         } catch (e: Throwable) {
             _errorMessageState.value = ErrorState(e.message.toString())
         }
@@ -93,4 +109,13 @@ class MainViewModel @Inject constructor(
         _errorMessageState.value = ErrorState("")
     }
 
+    fun updateDraftsListState(type: DocType) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                _draftsListState.value = getDraftsUseCase.execute(type).getOrThrow()
+            } catch (e: Throwable) {
+                _errorMessageState.value = ErrorState(e.message.toString())
+            }
+        }
+    }
 }

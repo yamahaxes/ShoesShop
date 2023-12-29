@@ -5,11 +5,11 @@ import android.util.Base64
 import dagger.hilt.android.scopes.ServiceScoped
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okio.IOException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
-import ru.tracefamily.shoesshop.domain.common.model.ConnectSettings
 import ru.tracefamily.shoesshop.domain.info.model.Card
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocksRow
 import ru.tracefamily.shoesshop.domain.info.model.Image
@@ -17,13 +17,14 @@ import ru.tracefamily.shoesshop.domain.info.model.Stocks
 import ru.tracefamily.shoesshop.domain.info.model.StocksCell
 import ru.tracefamily.shoesshop.domain.info.model.StocksRow
 import ru.tracefamily.shoesshop.domain.repo.InfoRepo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.ApiInfoService
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CardInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CommonStocksRowInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.ImageInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksCellInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksRowInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.ApiInfoService
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CardInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CommonStocksRowInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.ImageInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.StocksCellInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.StocksInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.StocksRowInfo
+import ru.tracefamily.shoesshop.repository.model.ConnectSettings
 import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -31,75 +32,62 @@ import javax.inject.Inject
 
 @ServiceScoped
 class InfoRepoImpl @Inject constructor(
-    override val connectSettings: ConnectSettings,
+    private val connectSettings: ConnectSettings,
     private val context: Context
 ) : InfoRepo {
 
-    override suspend fun getCard(barcode: Barcode): Result<Card> {
+    @Throws(IOException::class)
+    override suspend fun getCard(barcode: Barcode): Card {
         val result = getInstance().create(ApiInfoService::class.java)
             .getCard(getCredentials(), barcode.value)
 
         val body = result.body()
         if (result.isSuccessful) {
             return if (result.code() == HttpURLConnection.HTTP_OK) {
-                if (body != null) {
-                    Result.success(body.toCard().copy(barcode = barcode))
-                } else {
-                    Result.success(Card().copy(barcode = barcode))
-                }
+                body?.toCard()?.copy(barcode = barcode) ?: Card().copy(barcode = barcode)
             } else if (result.code() == HttpURLConnection.HTTP_NO_CONTENT) {
-                Result.failure(Throwable(context.getString(R.string.MessageTheCardNotFoundByBarcode)))
+                throw IOException(context.getString(R.string.MessageTheCardNotFoundByBarcode))
             } else {
-                Result.failure(Throwable(context.getString(R.string.MessageErrorReceiptCardWithCodeError).plus(result.code())))
+                throw IOException(context.getString(R.string.MessageErrorReceiptCardWithCodeError).plus(result.code()))
             }
         }
-        return Result.failure(Throwable(result.message()))
+        throw IOException(result.message())
     }
 
-    override suspend fun getImage(barcode: Barcode): Result<Image> {
+    @Throws(IOException::class)
+    override suspend fun getImage(barcode: Barcode): Image {
         val result = getInstance().create(ApiInfoService::class.java)
             .getBase64Image(getCredentials(), barcode.value)
 
         val body = result.body()
-        if (result.isSuccessful) {
-            return if (body != null) {
-                Result.success(body.toImage())
-            } else {
-                Result.success(Image())
-            }
-
+        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
+            return body?.toImage() ?: Image()
         }
-        return Result.failure(Throwable(result.message()))
+        throw IOException(result.message())
     }
 
-    override suspend fun getStocks(barcode: Barcode): Result<Stocks> {
+    @Throws(IOException::class)
+    override suspend fun getStocks(barcode: Barcode): Stocks {
         val result = getInstance().create(ApiInfoService::class.java)
             .getStocks(getCredentials(), barcode.value)
 
         val body = result.body()
-        if (result.isSuccessful) {
-            return if (body != null) {
-                Result.success(body.toStocks())
-            } else {
-                Result.success(Stocks())
-            }
+        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
+            return body?.toStocks() ?: Stocks()
         }
-        return Result.failure(Throwable(result.message()))
+        throw IOException(result.message())
     }
 
-    override suspend fun getCommonStocks(barcode: Barcode): Result<List<CommonStocksRow>> {
+    @Throws(IOException::class)
+    override suspend fun getCommonStocks(barcode: Barcode): List<CommonStocksRow> {
         val result = getInstance().create(ApiInfoService::class.java)
             .getCommonStocks(getCredentials(), barcode.value)
 
         val body = result.body()
-        if (result.isSuccessful) {
-            return if (body != null) {
-                Result.success(body.stock.map { it.toCommonStocksRow() })
-            } else {
-                Result.success(listOf())
-            }
+        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
+            return body?.stock?.map { it.toCommonStocksRow() } ?: listOf()
         }
-        return Result.failure(Throwable(result.message()))
+        throw  IOException(result.message())
     }
 
     private fun getInstance(): Retrofit {

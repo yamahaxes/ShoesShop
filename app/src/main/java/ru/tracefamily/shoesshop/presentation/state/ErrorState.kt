@@ -1,4 +1,4 @@
-package ru.tracefamily.shoesshop.presentation.states
+package ru.tracefamily.shoesshop.presentation.state
 
 data class ErrorState (
     val message: String = ""

@@ -1,4 +1,4 @@
-package ru.tracefamily.shoesshop.presentation.models
+package ru.tracefamily.shoesshop.presentation.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

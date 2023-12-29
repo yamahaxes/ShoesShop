@@ -10,11 +10,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import ru.tracefamily.shoesshop.domain.common.model.ConnectSettings
 import ru.tracefamily.shoesshop.domain.repo.BarcodeScannerRepo
 import ru.tracefamily.shoesshop.domain.repo.InfoRepo
+import ru.tracefamily.shoesshop.domain.repo.WarehouseRepo
 import ru.tracefamily.shoesshop.repository.BarcodeScannerRepoImpl
 import ru.tracefamily.shoesshop.repository.InfoRepoImpl
+import ru.tracefamily.shoesshop.repository.WarehouseRepoImpl
+import ru.tracefamily.shoesshop.repository.model.ConnectSettings
 import javax.inject.Singleton
 
 @Module
@@ -29,6 +31,15 @@ object RepoModule {
             username = "Администратор",
             password = "24681357",
         ), context
+    )
+
+    @Provides
+    fun provideApiWarehouseServiceRepo(): WarehouseRepo = WarehouseRepoImpl(
+        ConnectSettings(
+            serverAddress = "http://193.218.144.192/retail_storage1/",
+            username = "Администратор",
+            password = "24681357",
+        )
     )
 
     @Provides

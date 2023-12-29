@@ -11,7 +11,10 @@ import javax.inject.Inject
 class GetStocksUseCase @Inject constructor(
     private val apiInfo: InfoRepo
 ) : UseCaseExecutable<Barcode, Stocks> {
-
-    override suspend fun execute(input: Barcode): Result<Stocks> = apiInfo.getStocks(input)
-
+    override suspend fun execute(input: Barcode): Result<Stocks> =
+        try {
+            Result.success(apiInfo.getStocks(input))
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
 }

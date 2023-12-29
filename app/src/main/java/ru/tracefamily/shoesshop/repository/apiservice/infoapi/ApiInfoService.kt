@@ -1,13 +1,13 @@
-package ru.tracefamily.shoesshop.repository.httpservice.infoapi
+package ru.tracefamily.shoesshop.repository.apiservice.infoapi
 
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CardInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.CommonStocksInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.ImageInfo
-import ru.tracefamily.shoesshop.repository.httpservice.infoapi.model.StocksInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CardInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CommonStocksInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.ImageInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.StocksInfo
 
 interface ApiInfoService {
 

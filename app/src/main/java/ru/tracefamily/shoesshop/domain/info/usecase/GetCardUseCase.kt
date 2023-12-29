@@ -12,6 +12,11 @@ class GetCardUseCase @Inject constructor(
     private val apiRepo: InfoRepo
 ) : UseCaseExecutable<Barcode, Card> {
 
-    override suspend fun execute(input: Barcode): Result<Card> = apiRepo.getCard(input)
+    override suspend fun execute(input: Barcode): Result<Card> =
+        try {
+            Result.success(apiRepo.getCard(input))
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
 
 }

@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import ru.tracefamily.shoesshop.R
-import ru.tracefamily.shoesshop.presentation.models.BottomNavItem
+import ru.tracefamily.shoesshop.presentation.model.BottomNavItem
 
 object Constants {
 

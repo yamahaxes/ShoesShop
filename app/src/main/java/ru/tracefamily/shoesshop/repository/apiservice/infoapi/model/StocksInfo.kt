@@ -1,4 +1,4 @@
-package ru.tracefamily.shoesshop.repository.httpservice.infoapi.model
+package ru.tracefamily.shoesshop.repository.apiservice.infoapi.model
 
 data class StocksInfo(
     val stock: List<StocksRowInfo>,
