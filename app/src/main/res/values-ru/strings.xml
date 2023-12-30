@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Магазин обуви</string>
+    <string name="bottom_bar_label_product_info">Инфо</string>
+    <string name="bottom_bar_label_warehouse_management">Склад</string>
+    <string name="field_label_name">Наименование</string>
+    <string name="field_label_barcode">Штрихкод</string>
+    <string name="label_leftovers_in_the_store">Остатки в магазине</string>
+    <string name="label_column_size">Размер</string>
+    <string name="label_column_quantity">Количество</string>
+    <string name="label_column_cell">Ячейка</string>
+    <string name="label_missing">Отсутствует</string>
+    <string name="label_shopping_leftovers">Остатки магазинов</string>
+    <string name="ruble_abbreviation">р.</string>
+    <string name="piece_abbreviation">шт.</string>
+    <string name="message_header_error">Ошибка</string>
+    <string name="message_error_load_card">Ошибка загрузки карточки</string>
+    <string name="message_error_load_image">Ошибка загрузки изображения</string>
+    <string name="message_error_load_stocks">Ошибка загрузки остатков</string>
+    <string name="message_error_load_common_stocks">Ошибка загрузки остатков сети</string>
+</resources>

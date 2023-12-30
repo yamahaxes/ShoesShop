@@ -1,14 +1,9 @@
 package ru.tracefamily.shoesshop.domain.warehouse.model
 
 data class Document(
-    val type: DocumentType,
+    var id: Int = -1,
+    val type: DocType,
     val cell: String,
     val description: String,
-    val composition: List<CompositionRow>
+    val content: List<ContentRow>
 )
-
-enum class DocumentType {
-    ADD,
-    DELETE,
-    INVENTORY
-}

@@ -3,4 +3,27 @@
 
     <string name="bottom_bar_label_product_info">Info</string>
     <string name="bottom_bar_label_warehouse_management">Warehouse</string>
+
+    // Labels
+    <string name="field_label_name">Name</string>
+    <string name="field_label_barcode">Barcode</string>
+    <string name="label_leftovers_in_the_store">Leftovers in the store</string>
+    <string name="label_column_size">Size</string>
+    <string name="label_column_quantity">Quantity</string>
+    <string name="label_column_cell">Cell</string>
+    <string name="label_missing">Missing</string>
+    <string name="label_shopping_leftovers">Shopping leftovers\t</string>
+
+    // Abbreviations
+    <string name="ruble_abbreviation">rub</string>
+    <string name="piece_abbreviation">pc</string>
+
+    // User messages
+    <string name="message_header_error">Error</string>
+    <string name="message_error_load_card">Card loading error</string>
+    <string name="message_error_load_image">Image download error</string>
+    <string name="message_error_load_stocks">Error loading leftovers</string>
+    <string name="message_error_load_common_stocks">Error loading common leftovers</string>
+
+
 </resources>
