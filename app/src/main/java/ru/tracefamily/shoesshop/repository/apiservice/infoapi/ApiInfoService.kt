@@ -4,6 +4,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
+import retrofit2.http.Query
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CardInfo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CommonStocksInfo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.ImageInfo
@@ -20,7 +21,8 @@ interface ApiInfoService {
     @GET("hs/info_api/cards/image/{barcode}")
     suspend fun getBase64Image(
         @Header("Authorization") credentials: String,
-        @Path("barcode") barcode: String
+        @Path("barcode") barcode: String,
+        @Query("asObject") asObject: Boolean = true
     ): Response<ImageInfo>
 
     @GET("hs/info_api/cards/stock/{barcode}")

@@ -1,14 +1,12 @@
 package ru.tracefamily.shoesshop.presentation
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FabPosition
@@ -48,6 +46,9 @@ class MainActivity() : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        vm.currentScreen = Constants.ProductInfoNavItem.route
+
         setContent {
             ShoesShopTheme {
                 // A surface container using the 'background' color from the theme
@@ -75,6 +76,8 @@ class MainActivity() : ComponentActivity() {
 
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
+
+        vm.currentScreen = currentDestination?.route ?: ""
 
         NavigationBar {
             Constants.BottomNavItems.forEach { item ->
@@ -113,14 +116,11 @@ class MainActivity() : ComponentActivity() {
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = Constants.ProductInfoNavItem.route) {
-                InfoScreen(vm)
+                InfoScreen(Modifier.fillMaxSize(), vm)
             }
             composable(route = Constants.WarehouseManagementNavItem.route) {
-                Log.d("MyLog", vm.toString())
                 WarehouseScreen(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
+                    Modifier.fillMaxWidth(),
                     vm
                 )
             }
@@ -144,12 +144,18 @@ class MainActivity() : ComponentActivity() {
     private fun ErrorDialog() {
         val errorState by vm.errorMessageState.collectAsState()
 
-        if (errorState.message.isNotBlank()) {
+        if (errorState.resId != -1) {
             AlertDialog(
                 onDismissRequest = { vm.confirmErrors() },
                 confirmButton = { },
-                title = { Text(text = "Error") },
-                text = { Text(text = errorState.message) }
+                title = { Text(text = stringResource(R.string.message_header_error)) },
+                text = {
+                    Text(
+                        text = stringResource(id = errorState.resId) + if (errorState.description.isNotBlank()) {
+                            ": ".plus(errorState.description)
+                        } else { "" }
+                    )
+                }
             )
         }
     }

@@ -8,9 +8,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okio.IOException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
 import ru.tracefamily.shoesshop.domain.info.model.Card
+import ru.tracefamily.shoesshop.domain.info.model.CommonStocks
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocksRow
 import ru.tracefamily.shoesshop.domain.info.model.Image
 import ru.tracefamily.shoesshop.domain.info.model.Stocks
@@ -19,6 +19,7 @@ import ru.tracefamily.shoesshop.domain.info.model.StocksRow
 import ru.tracefamily.shoesshop.domain.repo.InfoRepo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.ApiInfoService
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CardInfo
+import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CommonStocksInfo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.CommonStocksRowInfo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.ImageInfo
 import ru.tracefamily.shoesshop.repository.apiservice.infoapi.model.StocksCellInfo
@@ -45,10 +46,8 @@ class InfoRepoImpl @Inject constructor(
         if (result.isSuccessful) {
             return if (result.code() == HttpURLConnection.HTTP_OK) {
                 body?.toCard()?.copy(barcode = barcode) ?: Card().copy(barcode = barcode)
-            } else if (result.code() == HttpURLConnection.HTTP_NO_CONTENT) {
-                throw IOException(context.getString(R.string.MessageTheCardNotFoundByBarcode))
             } else {
-                throw IOException(context.getString(R.string.MessageErrorReceiptCardWithCodeError).plus(result.code()))
+                Card(barcode = barcode)
             }
         }
         throw IOException(result.message())
@@ -79,13 +78,13 @@ class InfoRepoImpl @Inject constructor(
     }
 
     @Throws(IOException::class)
-    override suspend fun getCommonStocks(barcode: Barcode): List<CommonStocksRow> {
+    override suspend fun getCommonStocks(barcode: Barcode): CommonStocks {
         val result = getInstance().create(ApiInfoService::class.java)
             .getCommonStocks(getCredentials(), barcode.value)
 
         val body = result.body()
         if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
-            return body?.stock?.map { it.toCommonStocksRow() } ?: listOf()
+            return body?.toCommonStocks() ?: CommonStocks()
         }
         throw  IOException(result.message())
     }
@@ -135,6 +134,9 @@ fun StocksInfo.toStocks(): Stocks =
 fun StocksRowInfo.toStockRow(): StocksRow = StocksRow(name = name, size = size, quantity = quantity)
 
 fun StocksCellInfo.toStocksCell(): StocksCell = StocksCell(name = name, size = size, cell = cell)
+
+fun CommonStocksInfo.toCommonStocks(): CommonStocks =
+    CommonStocks(rows = stock.map { it.toCommonStocksRow() })
 
 fun CommonStocksRowInfo.toCommonStocksRow(): CommonStocksRow =
     CommonStocksRow(store = store, name = name, size = size, quantity = quantity)

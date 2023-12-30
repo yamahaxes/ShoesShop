@@ -45,52 +45,44 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlinx.coroutines.flow.StateFlow
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.presentation.MainViewModel
+import ru.tracefamily.shoesshop.presentation.state.InfoState
 import ru.tracefamily.shoesshop.repository.utils.AutoSizeableText
 
 @Composable
-fun InfoScreen(vm: MainViewModel) {
+fun InfoScreen(modifier: Modifier, vm: MainViewModel) {
+
     val stateScroll = rememberScrollState()
 
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = modifier, contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.verticalScroll(stateScroll)
+            modifier = Modifier.fillMaxSize().verticalScroll(stateScroll)
         ) {
-            ImageBlock(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp, end = 15.dp, top = 15.dp)
-                    .height(150.dp),
-                vm
-            )
             CardBlock(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp, end = 15.dp, top = 15.dp),
-                vm
+                vm.infoState
             )
             StocksBlock(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 15.dp),
-                vm
+                    .padding(start = 5.dp, end = 5.dp, top = 15.dp), vm.infoState
             )
             CommonStocksBlock(
                 Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp),
-                vm
+                    .padding(start = 5.dp, end = 5.dp, top = 15.dp, bottom = 150.dp), vm.infoState
             )
         }
         LoadingInfo(
             modifier = Modifier
                 .fillMaxSize()
-                .height(200.dp),
-            vm
+                .height(200.dp), vm
         )
     }
 }
@@ -110,60 +102,50 @@ private fun LoadingInfo(modifier: Modifier, vm: MainViewModel) {
 }
 
 @Composable
-private fun ImageBlock(modifier: Modifier, vm: MainViewModel) {
-    val state = vm.imageState.collectAsState()
+private fun CardBlock(modifier: Modifier, infoStateFlow: StateFlow<InfoState>) {
+
+    val state by infoStateFlow.collectAsState()
+
+    val discount = when {
+        state.card.priceBeforeDiscount > state.card.price -> -(100 - state.card.price * 100 / state.card.priceBeforeDiscount) / 5 * 5
+        else -> 0
+    }
 
     Card(
-        modifier = modifier
+        modifier = modifier,
     ) {
-        if (state.value.base64Value.isNotBlank()) {
-            val decodedString: ByteArray =
-                Base64.decode(state.value.base64Value, Base64.DEFAULT)
-            val decodedByte =
-                BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+
+        if (state.image.base64Value.isNotEmpty()) {
+            val decodedString: ByteArray = Base64.decode(state.image.base64Value, Base64.DEFAULT)
+            val decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
             Image(
                 bitmap = decodedByte.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.FillHeight,
                 alignment = Alignment.Center,
                 modifier = Modifier
+                    .height(200.dp)
                     .fillMaxSize()
                     .padding(5.dp)
             )
         }
-    }
-}
 
-@Composable
-private fun CardBlock(modifier: Modifier, vm: MainViewModel) {
-    val state = vm.cardState.collectAsState()
-
-    val discount = when {
-        state.value.priceBeforeDiscount > state.value.price -> -(100 - state.value.price * 100 / state.value.priceBeforeDiscount) / 5 * 5
-        else -> 0
-    }
-
-    Card(
-        modifier = modifier
-    ) {
         TextFieldInfo(
-            label = stringResource(R.string.FieldLabelBarcode),
-            text = state.value.barcode.value
+            label = stringResource(R.string.field_label_barcode), text = state.card.barcode.value
         )
-        TextFieldInfo(label = stringResource(R.string.FieldLabelName), text = state.value.name)
+        TextFieldInfo(label = stringResource(R.string.field_label_name), text = state.card.name)
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(75.dp),
-            contentAlignment = Alignment.Center
+                .height(75.dp), contentAlignment = Alignment.Center
         ) {
             if (discount == 0) {
                 // Price without discount
                 Text(
                     fontSize = 54.sp,
-                    text = state.value.price.toString().plus(" ")
-                        .plus(stringResource(R.string.RubleAbbreviation)),
+                    text = state.card.price.toString().plus(" ")
+                        .plus(stringResource(R.string.ruble_abbreviation)),
                 )
             } else {
                 // Price with discount
@@ -174,16 +156,15 @@ private fun CardBlock(modifier: Modifier, vm: MainViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AutoSizeableText(
-                        modifier = Modifier
-                            .weight(0.2f),
+                        modifier = Modifier.weight(0.2f),
                         style = TextStyle(textDecoration = TextDecoration.LineThrough),
                         maxTextSize = 22.sp,
                         minTextSize = 12.sp,
-                        text = state.value.priceBeforeDiscount.toString()
+                        text = state.card.priceBeforeDiscount.toString()
                     )
                     AutoSizeableText(
-                        text = state.value.price.toString().plus(" ")
-                            .plus(stringResource(id = R.string.RubleAbbreviation)),
+                        text = state.card.price.toString().plus(" ")
+                            .plus(stringResource(id = R.string.ruble_abbreviation)),
                         maxTextSize = 48.sp,
                         minTextSize = 10.sp,
                         modifier = Modifier
@@ -198,8 +179,7 @@ private fun CardBlock(modifier: Modifier, vm: MainViewModel) {
                         contentAlignment = Alignment.Center
                     ) {
                         AutoSizeableText(
-                            modifier = Modifier
-                                .padding(10.dp),
+                            modifier = Modifier.padding(10.dp),
                             maxTextSize = 18.sp,
                             minTextSize = 6.sp,
                             text = discount.toString().plus("%")
@@ -212,8 +192,9 @@ private fun CardBlock(modifier: Modifier, vm: MainViewModel) {
 }
 
 @Composable
-private fun StocksBlock(modifier: Modifier, vm: MainViewModel) {
-    val state by vm.stocksState.collectAsState()
+private fun StocksBlock(modifier: Modifier, infoStateFlow: StateFlow<InfoState>) {
+
+    val state by infoStateFlow.collectAsState()
 
     val sizeColumnWeight = .3f
     val qualityColumnWeight = .3f
@@ -224,7 +205,7 @@ private fun StocksBlock(modifier: Modifier, vm: MainViewModel) {
 
             // Heading
             Text(
-                text = stringResource(R.string.LabelLeftoversInTheStore),
+                text = stringResource(R.string.label_leftovers_in_the_store),
                 modifier = Modifier.padding(bottom = 10.dp),
                 fontSize = MaterialTheme.typography.titleLarge.fontSize
             )
@@ -232,22 +213,20 @@ private fun StocksBlock(modifier: Modifier, vm: MainViewModel) {
             // Table header
             Row {
                 TableCell(
-                    text = stringResource(R.string.LabelColumnSize),
-                    weight = sizeColumnWeight
+                    text = stringResource(R.string.label_column_size), weight = sizeColumnWeight
                 )
                 TableCell(
-                    text = stringResource(R.string.LabelColumnQuantity),
+                    text = stringResource(R.string.label_column_quantity),
                     weight = qualityColumnWeight
                 )
                 TableCell(
-                    text = stringResource(R.string.LabelColumnCell),
-                    weight = cellColumnWeight
+                    text = stringResource(R.string.label_column_cell), weight = cellColumnWeight
                 )
             }
             Divider(thickness = 3.dp, modifier = Modifier.fillMaxWidth())
             // data
-            val stocksList = state.rows
-            val cellsList = state.cells
+            val stocksList = state.stocks.rows
+            val cellsList = state.stocks.cells
 
             if (stocksList.isNotEmpty()) {
                 stocksList.sortedWith { o1, o2 ->
@@ -257,7 +236,7 @@ private fun StocksBlock(modifier: Modifier, vm: MainViewModel) {
                         TableCell(text = item.size, weight = sizeColumnWeight)
                         TableCell(
                             text = item.quantity.toString().plus(" ")
-                                .plus(stringResource(R.string.PieceAbbreviation)),
+                                .plus(stringResource(R.string.piece_abbreviation)),
                             weight = qualityColumnWeight
                         )
                         Column(Modifier.weight(cellColumnWeight)) {
@@ -273,26 +252,25 @@ private fun StocksBlock(modifier: Modifier, vm: MainViewModel) {
                     Divider(thickness = 1.dp, modifier = Modifier.fillMaxWidth())
                 }
             } else {
-                Text(text = stringResource(R.string.LabelMissing), fontStyle = FontStyle.Italic)
+                Text(text = stringResource(R.string.label_missing), fontStyle = FontStyle.Italic)
             }
         }
     }
 }
 
 @Composable
-private fun CommonStocksBlock(modifier: Modifier, vm: MainViewModel) {
+private fun CommonStocksBlock(modifier: Modifier, infoStateFlow: StateFlow<InfoState>) {
 
-    val state by vm.commonStocksState.collectAsState()
+    val state by infoStateFlow.collectAsState()
 
-    val inventory = state
     val stores = mutableSetOf<String>()
-    inventory.forEach { stores.add(it.store) }
+    state.commonStocks.rows.forEach { stores.add(it.store) }
 
     Box(modifier = modifier) {
         Column {
 
             Text(
-                text = stringResource(R.string.LabelShoppingLeftovers),
+                text = stringResource(R.string.label_shopping_leftovers),
                 modifier = Modifier.padding(top = 10.dp, bottom = 10.dp),
                 fontSize = MaterialTheme.typography.titleLarge.fontSize
             )
@@ -312,7 +290,7 @@ private fun CommonStocksBlock(modifier: Modifier, vm: MainViewModel) {
                         modifier = Modifier.height(35.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        inventory.filter {
+                        state.commonStocks.rows.filter {
                             it.store == store
                         }.sortedWith { o1, o2 ->
                             o1.size.compareTo(o2.size)
@@ -327,7 +305,7 @@ private fun CommonStocksBlock(modifier: Modifier, vm: MainViewModel) {
             } else {
                 Divider(thickness = 3.dp, modifier = Modifier.fillMaxWidth())
                 Text(
-                    text = stringResource(R.string.LabelMissing),
+                    text = stringResource(R.string.label_missing),
                     fontStyle = FontStyle.Italic,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -339,9 +317,7 @@ private fun CommonStocksBlock(modifier: Modifier, vm: MainViewModel) {
 
 @Composable
 private fun TextFieldInfo(
-    label: String,
-    text: String,
-    maxLines: Int = Int.MAX_VALUE
+    label: String, text: String, maxLines: Int = Int.MAX_VALUE
 ) {
 
     Column(
