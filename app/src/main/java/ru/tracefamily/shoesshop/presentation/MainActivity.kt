@@ -1,5 +1,6 @@
 package ru.tracefamily.shoesshop.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,22 +33,48 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import dagger.hilt.android.AndroidEntryPoint
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.presentation.screen.InfoScreen
 import ru.tracefamily.shoesshop.presentation.screen.WarehouseScreen
 import ru.tracefamily.shoesshop.presentation.theme.ShoesShopTheme
 import ru.tracefamily.shoesshop.presentation.utils.Constants
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity() : ComponentActivity() {
 
     private val vm: MainViewModel by viewModels()
 
+    @Inject
+    lateinit var context: Context
+
+    @Inject
+    lateinit var scanner: GmsBarcodeScanner
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         vm.currentScreen = Constants.ProductInfoNavItem.route
+
+        val moduleInstallClient = ModuleInstall.getClient(context)
+
+        moduleInstallClient.areModulesAvailable(scanner)
+            .addOnSuccessListener {
+                if (!it.areModulesAvailable()) {
+
+                    val moduleInstallRequest =
+                        ModuleInstallRequest.newBuilder()
+                            .addApi(scanner)
+                            .build()
+
+                    moduleInstallClient
+                        .installModules(moduleInstallRequest)
+                }
+            }
 
         setContent {
             ShoesShopTheme {
@@ -142,18 +169,26 @@ class MainActivity() : ComponentActivity() {
 
     @Composable
     private fun ErrorDialog() {
-        val errorState by vm.errorMessageState.collectAsState()
 
-        if (errorState.resId != -1) {
+        val errorState by vm.errorMessageState.collectAsState()
+        val errorList = errorState.errors
+
+        if (errorList.isNotEmpty()) {
+
+            var errorAsString = ""
+            errorList.forEach { error ->
+                errorAsString =
+                    errorAsString.plus(stringResource(id = error.resId)).plus(":\n").plus(error.message)
+                        .plus("\n")
+            }
+
             AlertDialog(
                 onDismissRequest = { vm.confirmErrors() },
                 confirmButton = { },
                 title = { Text(text = stringResource(R.string.message_header_error)) },
                 text = {
                     Text(
-                        text = stringResource(id = errorState.resId) + if (errorState.description.isNotBlank()) {
-                            ": ".plus(errorState.description)
-                        } else { "" }
+                        text = errorAsString
                     )
                 }
             )

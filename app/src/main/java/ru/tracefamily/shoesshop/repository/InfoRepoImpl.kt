@@ -5,10 +5,11 @@ import android.util.Base64
 import dagger.hilt.android.scopes.ServiceScoped
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import okio.IOException
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
+import ru.tracefamily.shoesshop.domain.exception.HttpException
 import ru.tracefamily.shoesshop.domain.info.model.Card
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocks
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocksRow
@@ -37,56 +38,65 @@ class InfoRepoImpl @Inject constructor(
     private val context: Context
 ) : InfoRepo {
 
-    @Throws(IOException::class)
+    @Throws(HttpException::class)
     override suspend fun getCard(barcode: Barcode): Card {
         val result = getInstance().create(ApiInfoService::class.java)
             .getCard(getCredentials(), barcode.value)
 
-        val body = result.body()
-        if (result.isSuccessful) {
-            return if (result.code() == HttpURLConnection.HTTP_OK) {
-                body?.toCard()?.copy(barcode = barcode) ?: Card().copy(barcode = barcode)
-            } else {
-                Card(barcode = barcode)
-            }
-        }
-        throw IOException(result.message())
+        return getResult(result, HttpURLConnection.HTTP_OK) {
+            it?.toCard()
+        } ?: Card()
     }
 
-    @Throws(IOException::class)
+    @Throws(HttpException::class)
     override suspend fun getImage(barcode: Barcode): Image {
         val result = getInstance().create(ApiInfoService::class.java)
             .getBase64Image(getCredentials(), barcode.value)
 
-        val body = result.body()
-        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
-            return body?.toImage() ?: Image()
-        }
-        throw IOException(result.message())
+        return getResult(result, HttpURLConnection.HTTP_OK) {
+            it?.toImage()
+        } ?: Image()
+
     }
 
-    @Throws(IOException::class)
+    @Throws(HttpException::class)
     override suspend fun getStocks(barcode: Barcode): Stocks {
         val result = getInstance().create(ApiInfoService::class.java)
             .getStocks(getCredentials(), barcode.value)
 
-        val body = result.body()
-        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
-            return body?.toStocks() ?: Stocks()
-        }
-        throw IOException(result.message())
+        return getResult(result, HttpURLConnection.HTTP_OK) {
+            it?.toStocks()
+        } ?: Stocks()
+
     }
 
-    @Throws(IOException::class)
+    @Throws(HttpException::class)
     override suspend fun getCommonStocks(barcode: Barcode): CommonStocks {
+
         val result = getInstance().create(ApiInfoService::class.java)
             .getCommonStocks(getCredentials(), barcode.value)
 
+        return getResult(result, HttpURLConnection.HTTP_OK) {
+            it?.toCommonStocks()
+        } ?: CommonStocks()
+
+    }
+
+    @Throws(HttpException::class)
+    private fun <T, R> getResult(
+        result: Response<T>,
+        successfulCode: Int,
+        convert: (T?) -> (R?)
+    ): R? {
         val body = result.body()
-        if (result.isSuccessful && result.code() == HttpURLConnection.HTTP_OK) {
-            return body?.toCommonStocks() ?: CommonStocks()
+        if (result.isSuccessful) {
+            return if (result.code() == successfulCode) {
+                convert(body)
+            } else {
+                throw HttpException(result.message(), result.code())
+            }
         }
-        throw  IOException(result.message())
+        throw HttpException(result.message())
     }
 
     private fun getInstance(): Retrofit {

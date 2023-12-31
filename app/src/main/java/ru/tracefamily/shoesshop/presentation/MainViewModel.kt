@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
+import ru.tracefamily.shoesshop.domain.common.model.Error
 import ru.tracefamily.shoesshop.domain.info.model.Card
 import ru.tracefamily.shoesshop.domain.info.model.CommonStocks
 import ru.tracefamily.shoesshop.domain.info.model.Image
@@ -53,7 +54,7 @@ class MainViewModel @Inject constructor(
     val warehouseState = _warehouseState.asStateFlow()
 
     // If get error
-    private val _errorMessageState = MutableStateFlow(ErrorState(-1, ""))
+    private val _errorMessageState = MutableStateFlow(ErrorState(mutableListOf()))
     val errorMessageState = _errorMessageState.asStateFlow()
 
     var currentScreen: String = ""
@@ -65,51 +66,55 @@ class MainViewModel @Inject constructor(
                     val tone = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                     tone.startTone(ToneGenerator.TONE_SUP_PIP, 150)
 
+                    val errorState = ErrorState(mutableListOf())
+
                     if (currentScreen == Constants.ProductInfoNavItem.route) {
-                        updateInfoState(barcode)
+                        updateInfoState(barcode, errorState)
                     } else if (currentScreen == Constants.WarehouseManagementNavItem.route) {
 
+                    }
+
+                    if (errorState.errors.isNotEmpty()) {
+                        _errorMessageState.value = errorState
                     }
                 }
             }
         }
     }
 
-    private suspend fun updateInfoState(barcode: Barcode) = coroutineScope {
+    private suspend fun updateInfoState(barcode: Barcode, errorState: ErrorState) = coroutineScope {
 
         _loadingInfo.value = true
+
+        val errors = errorState.errors
 
         // default values
         _infoState.value = InfoState()
 
         val cardDeferred = async {
             getCardUseCase.execute(barcode).getOrElse {
-                _errorMessageState.value =
-                    ErrorState(R.string.message_error_load_card, it.message ?: "")
+                errors.add(Error(R.string.message_error_load_card, it.toString()))
                 Card(barcode = barcode)
             }
         }
 
         val imageDeferred = async {
             getImageUseCase.execute(barcode).getOrElse {
-                _errorMessageState.value =
-                    ErrorState(R.string.message_error_load_image, it.message ?: "")
+                errors.add(Error(R.string.message_error_load_image, it.toString()))
                 Image()
             }
         }
 
         val stocksDeferred = async {
             getStocksUseCase.execute(barcode).getOrElse {
-                _errorMessageState.value =
-                    ErrorState(R.string.message_error_load_stocks, it.message ?: "")
+                errors.add(Error(R.string.message_error_load_stocks, it.toString()))
                 Stocks()
             }
         }
 
         val commonStocksDeferred = async {
             getCommonStocksUseCase.execute(barcode).getOrElse {
-                _errorMessageState.value =
-                    ErrorState(R.string.message_error_load_common_stocks, it.message ?: "")
+                errors.add(Error(R.string.message_error_load_common_stocks, it.toString()))
                 CommonStocks()
             }
         }
@@ -125,7 +130,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun confirmErrors() {
-        _errorMessageState.value = ErrorState(-1, "")
+        _errorMessageState.value = ErrorState(mutableListOf())
     }
 
 }

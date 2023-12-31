@@ -1,8 +1,7 @@
 package ru.tracefamily.shoesshop.presentation.state
 
-import androidx.annotation.StringRes
+import ru.tracefamily.shoesshop.domain.common.model.Error
 
-data class ErrorState (
-    @StringRes val resId: Int,
-    val description: String
+data class ErrorState(
+    val errors: MutableList<Error>
 )
