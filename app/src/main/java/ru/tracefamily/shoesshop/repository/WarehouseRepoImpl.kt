@@ -14,8 +14,8 @@ class WarehouseRepoImpl(
         // fake data
         return listOf(
             Document(id = 1, type = DocType.ADD, "A-1-1", "0000001", listOf()),
-            Document(id = 2, type = DocType.DELETE, "A-1-2", "0000002", listOf()),
-            Document(id = 3, type = DocType.INVENTORY, "A-2-1", "0000003", listOf())
+            Document(id = 2, type = DocType.WITHDRAW, "A-1-2", "0000002", listOf()),
+            Document(id = 3, type = DocType.RECALCULATE, "A-2-1", "0000003", listOf())
         )
     }
 

@@ -22,6 +22,7 @@ import ru.tracefamily.shoesshop.domain.info.usecase.GetCommonStocksUseCase
 import ru.tracefamily.shoesshop.domain.info.usecase.GetImageUseCase
 import ru.tracefamily.shoesshop.domain.info.usecase.GetStocksUseCase
 import ru.tracefamily.shoesshop.domain.repo.BarcodeScannerRepo
+import ru.tracefamily.shoesshop.domain.warehouse.model.DocType
 import ru.tracefamily.shoesshop.domain.warehouse.usecase.GetDraftsUseCase
 import ru.tracefamily.shoesshop.domain.warehouse.usecase.PostDocumentUseCase
 import ru.tracefamily.shoesshop.presentation.state.ErrorState
@@ -127,6 +128,17 @@ class MainViewModel @Inject constructor(
         )
 
         _loadingInfo.value = false
+    }
+
+    fun changeCurrentDocType(type: DocType) {
+        viewModelScope.launch {
+            updateWarehouseState(type)
+        }
+    }
+
+    private suspend fun updateWarehouseState(docType: DocType) {
+        val drafts = getDraftsUseCase.execute(docType).getOrDefault(listOf())
+        _warehouseState.value = _warehouseState.value.copy(drafts = drafts, currentType = docType)
     }
 
     fun confirmErrors() {

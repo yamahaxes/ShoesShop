@@ -25,5 +25,10 @@
     <string name="message_error_load_stocks">Error loading leftovers</string>
     <string name="message_error_load_common_stocks">Error loading common leftovers</string>
 
+    // Types of documents
+    <string name="doctype_add">Add to cell</string>
+    <string name="doctype_withdraw">Withdraw from cell</string>
+    <string name="doctype_recalculate">Recalculate cell</string>
+
 
 </resources>

@@ -49,7 +49,7 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.presentation.MainViewModel
 import ru.tracefamily.shoesshop.presentation.state.InfoState
-import ru.tracefamily.shoesshop.repository.utils.AutoSizeableText
+import ru.tracefamily.shoesshop.presentation.utils.AutoSizeableText
 
 @Composable
 fun InfoScreen(modifier: Modifier, vm: MainViewModel) {
