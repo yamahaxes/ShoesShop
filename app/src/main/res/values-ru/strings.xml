@@ -19,6 +19,7 @@
     <string name="message_error_load_stocks">Ошибка загрузки остатков</string>
     <string name="message_error_load_common_stocks">Ошибка загрузки остатков сети</string>
 
+    <string name="message_error_load_drafts">Ошибка загруки черновиков</string>
     <string name="doctype_add">Добавление в ячейку</string>
     <string name="doctype_withdraw">Изъятие из ячейки</string>
     <string name="doctype_recalculate">Пересчет ячейки</string>

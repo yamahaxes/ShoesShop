@@ -24,6 +24,7 @@
     <string name="message_error_load_image">Image download error</string>
     <string name="message_error_load_stocks">Error loading leftovers</string>
     <string name="message_error_load_common_stocks">Error loading common leftovers</string>
+    <string name="message_error_load_drafts">Error loading drafts</string>
 
     // Types of documents
     <string name="doctype_add">Add to cell</string>

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.tracefamily.shoesshop.R
+import ru.tracefamily.shoesshop.domain.common.isBarcodeOfCell
 import ru.tracefamily.shoesshop.domain.common.model.Barcode
 import ru.tracefamily.shoesshop.domain.common.model.Error
 import ru.tracefamily.shoesshop.domain.info.model.Card
@@ -23,6 +24,7 @@ import ru.tracefamily.shoesshop.domain.info.usecase.GetImageUseCase
 import ru.tracefamily.shoesshop.domain.info.usecase.GetStocksUseCase
 import ru.tracefamily.shoesshop.domain.repo.BarcodeScannerRepo
 import ru.tracefamily.shoesshop.domain.warehouse.model.DocType
+import ru.tracefamily.shoesshop.domain.warehouse.model.Document
 import ru.tracefamily.shoesshop.domain.warehouse.usecase.GetDraftsUseCase
 import ru.tracefamily.shoesshop.domain.warehouse.usecase.PostDocumentUseCase
 import ru.tracefamily.shoesshop.presentation.state.ErrorState
@@ -52,7 +54,13 @@ class MainViewModel @Inject constructor(
 
     // Warehouse block state
     private val _warehouseState = MutableStateFlow(WarehouseState())
+    private val _documentIsOpenState = MutableStateFlow(false)
+
     val warehouseState = _warehouseState.asStateFlow()
+    val documentIsOpenState = _documentIsOpenState.asStateFlow()
+
+    var currentDocument: Document = Document()
+        private set
 
     // If get error
     private val _errorMessageState = MutableStateFlow(ErrorState(mutableListOf()))
@@ -72,15 +80,39 @@ class MainViewModel @Inject constructor(
                     if (currentScreen == Constants.ProductInfoNavItem.route) {
                         updateInfoState(barcode, errorState)
                     } else if (currentScreen == Constants.WarehouseManagementNavItem.route) {
-
+                        if (isBarcodeOfCell(barcode) && !documentIsOpenState.value) {
+                            currentDocument = Document(cell = barcode.value, description = barcode.value)
+                            _documentIsOpenState.value = true
+                        } else { // if the document is open
+                            // TODO
+                        }
                     }
 
-                    if (errorState.errors.isNotEmpty()) {
-                        _errorMessageState.value = errorState
-                    }
+                    updateErrorState(errorState)
                 }
             }
         }
+    }
+
+    fun changeCurrentDocType(type: DocType) {
+        viewModelScope.launch {
+            val errorState = ErrorState(mutableListOf())
+            updateWarehouseState(type, errorState)
+            updateErrorState(errorState)
+        }
+    }
+
+    fun openDocument(document: Document) {
+        currentDocument = document.copy()
+        _documentIsOpenState.value = true
+    }
+
+    fun closeDocument() {
+        _documentIsOpenState.value = false
+    }
+
+    fun confirmErrors() {
+        _errorMessageState.value = ErrorState(mutableListOf())
     }
 
     private suspend fun updateInfoState(barcode: Barcode, errorState: ErrorState) = coroutineScope {
@@ -130,19 +162,20 @@ class MainViewModel @Inject constructor(
         _loadingInfo.value = false
     }
 
-    fun changeCurrentDocType(type: DocType) {
-        viewModelScope.launch {
-            updateWarehouseState(type)
-        }
-    }
+    private suspend fun updateWarehouseState(docType: DocType, errorState: ErrorState) {
+        val errors = errorState.errors
 
-    private suspend fun updateWarehouseState(docType: DocType) {
-        val drafts = getDraftsUseCase.execute(docType).getOrDefault(listOf())
+        val drafts = getDraftsUseCase.execute(docType).getOrElse {
+            errors.add(Error(R.string.message_error_load_drafts, it.toString()))
+            listOf()
+        }
         _warehouseState.value = _warehouseState.value.copy(drafts = drafts, currentType = docType)
     }
 
-    fun confirmErrors() {
-        _errorMessageState.value = ErrorState(mutableListOf())
+    private fun updateErrorState(errorState: ErrorState) {
+        if (errorState.errors.isNotEmpty()) {
+            _errorMessageState.value = errorState
+        }
     }
 
 }

@@ -84,7 +84,7 @@ class MainActivity() : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-
+                    
                     Scaffold(
                         bottomBar = { BottomBar(navController) },
                         floatingActionButton = { ScanBarcodeButton() },
@@ -111,6 +111,7 @@ class MainActivity() : ComponentActivity() {
                 NavigationBarItem(
                     selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                     onClick = {
+
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
@@ -178,7 +179,8 @@ class MainActivity() : ComponentActivity() {
             var errorAsString = ""
             errorList.forEach { error ->
                 errorAsString =
-                    errorAsString.plus(stringResource(id = error.resId)).plus(":\n").plus(error.message)
+                    errorAsString.plus(stringResource(id = error.resId)).plus(":\n")
+                        .plus(error.message)
                         .plus("\n")
             }
 

@@ -1,8 +1,10 @@
 package ru.tracefamily.shoesshop.presentation.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +41,13 @@ import ru.tracefamily.shoesshop.presentation.utils.AutoSizeableText
 
 @Composable
 fun WarehouseScreen(modifier: Modifier, vm: MainViewModel) {
+
+    val docIsOpenState by vm.documentIsOpenState.collectAsState()
+
+    if (docIsOpenState) {
+        OpenDocument(vm = vm)
+        return
+    }
 
     Column(
         modifier = modifier
@@ -57,7 +68,6 @@ fun WarehouseScreen(modifier: Modifier, vm: MainViewModel) {
 
         DocumentsList(Modifier.fillMaxSize(), vm)
     }
-
 }
 
 @Composable
@@ -69,11 +79,30 @@ fun DocumentsList(modifier: Modifier, vm: MainViewModel) {
         modifier = modifier,
         content = {
             item {
-                state.drafts.forEach { it ->
-                    Card {
-                        Text(text = it.description)
+                state.drafts.forEach {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                            .clickable { vm.openDocument(it) },
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 3.dp,
+                        )
+                    ) {
+                        Text(
+                            text = it.cell,
+                            modifier = Modifier.padding(3.dp),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = it.description,
+                            modifier = Modifier.padding(3.dp)
+                            )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(150.dp))
             }
         })
 }

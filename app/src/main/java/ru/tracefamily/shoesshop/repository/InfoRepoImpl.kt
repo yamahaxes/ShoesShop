@@ -44,7 +44,7 @@ class InfoRepoImpl @Inject constructor(
             .getCard(getCredentials(), barcode.value)
 
         return getResult(result, HttpURLConnection.HTTP_OK) {
-            it?.toCard()
+            it?.toCard(barcode)
         } ?: Card()
     }
 
@@ -124,12 +124,12 @@ class InfoRepoImpl @Inject constructor(
 
 }
 
-fun CardInfo.toCard(): Card =
+fun CardInfo.toCard(barcode: Barcode = Barcode()): Card =
     Card(
         name = name,
         price = price,
         priceBeforeDiscount = priceBeforeDiscount,
-        barcode = Barcode()
+        barcode = barcode
     )
 
 fun ImageInfo.toImage(): Image =
