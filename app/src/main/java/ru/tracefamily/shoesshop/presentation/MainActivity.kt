@@ -1,6 +1,7 @@
 package ru.tracefamily.shoesshop.presentation
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -37,6 +39,7 @@ import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import ru.tracefamily.shoesshop.R
 import ru.tracefamily.shoesshop.presentation.screen.InfoScreen
 import ru.tracefamily.shoesshop.presentation.screen.WarehouseScreen
@@ -84,7 +87,7 @@ class MainActivity() : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    
+
                     Scaffold(
                         bottomBar = { BottomBar(navController) },
                         floatingActionButton = { ScanBarcodeButton() },
@@ -95,6 +98,22 @@ class MainActivity() : ComponentActivity() {
                 }
             }
             ErrorDialog()
+        }
+
+        // subscribe viewmodel events
+        val activityContext = this
+        lifecycleScope.launch {
+            vm.openDocumentState.collect { document ->
+                if (document != null) {
+                    val intent = Intent(activityContext, DocumentActivity::class.java)
+                    intent.putExtra("id", document.id)
+                    intent.putExtra("cell", document.cell)
+
+                    activityContext.startActivity(
+                        intent
+                    )
+                }
+            }
         }
     }
 
@@ -129,7 +148,9 @@ class MainActivity() : ComponentActivity() {
                             contentDescription = item.route
                         )
                     },
-                    label = { Text(text = stringResource(id = item.labelId)) })
+                    label = { Text(text = stringResource(id = item.labelId)) },
+                    alwaysShowLabel = false
+                )
             }
         }
 

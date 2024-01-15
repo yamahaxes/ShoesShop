@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -29,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,13 +42,6 @@ import ru.tracefamily.shoesshop.presentation.utils.AutoSizeableText
 
 @Composable
 fun WarehouseScreen(modifier: Modifier, vm: MainViewModel) {
-
-    val docIsOpenState by vm.documentIsOpenState.collectAsState()
-
-    if (docIsOpenState) {
-        OpenDocument(vm = vm)
-        return
-    }
 
     Column(
         modifier = modifier
@@ -65,7 +59,7 @@ fun WarehouseScreen(modifier: Modifier, vm: MainViewModel) {
             modifier = Modifier.padding(start = 5.dp, end = 5.dp, top = 5.dp),
             vm = vm
         )
-
+        Divider()
         DocumentsList(Modifier.fillMaxSize(), vm)
     }
 }
@@ -80,27 +74,22 @@ fun DocumentsList(modifier: Modifier, vm: MainViewModel) {
         content = {
             item {
                 state.drafts.forEach {
-                    Card(
+                    ListItem(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .clickable { vm.openDocument(it) },
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 3.dp,
-                        )
-                    ) {
-                        Text(
-                            text = it.cell,
-                            modifier = Modifier.padding(3.dp),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = it.description,
-                            modifier = Modifier.padding(3.dp)
+                            .clickable { vm.openDocument(it) }
+                            .padding(horizontal = 5.dp, vertical = 3.dp),
+                        headlineContent = { Text(text = it.cell) },
+                        supportingContent = { Text(text = it.description) },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Filled.Create,
+                                contentDescription = null
                             )
-                    }
+                        },
+                        shadowElevation = 3.dp,
+                    )
                 }
+
 
                 Spacer(modifier = Modifier.height(150.dp))
             }

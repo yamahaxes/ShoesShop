@@ -28,6 +28,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".presentation.DocumentActivity"
+            android:theme="@style/Theme.ShoesShop">
+
+        </activity>
     </application>
 
 </manifest>

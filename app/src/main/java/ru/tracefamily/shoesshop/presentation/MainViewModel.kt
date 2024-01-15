@@ -54,13 +54,10 @@ class MainViewModel @Inject constructor(
 
     // Warehouse block state
     private val _warehouseState = MutableStateFlow(WarehouseState())
-    private val _documentIsOpenState = MutableStateFlow(false)
+    private val _openDocumentState = MutableStateFlow<Document?>(null)
 
     val warehouseState = _warehouseState.asStateFlow()
-    val documentIsOpenState = _documentIsOpenState.asStateFlow()
-
-    var currentDocument: Document = Document()
-        private set
+    val openDocumentState = _openDocumentState.asStateFlow()
 
     // If get error
     private val _errorMessageState = MutableStateFlow(ErrorState(mutableListOf()))
@@ -80,11 +77,8 @@ class MainViewModel @Inject constructor(
                     if (currentScreen == Constants.ProductInfoNavItem.route) {
                         updateInfoState(barcode, errorState)
                     } else if (currentScreen == Constants.WarehouseManagementNavItem.route) {
-                        if (isBarcodeOfCell(barcode) && !documentIsOpenState.value) {
-                            currentDocument = Document(cell = barcode.value, description = barcode.value)
-                            _documentIsOpenState.value = true
-                        } else { // if the document is open
-                            // TODO
+                        if (isBarcodeOfCell(barcode)) {
+                            _openDocumentState.value = Document(cell = barcode.value)
                         }
                     }
 
@@ -103,12 +97,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun openDocument(document: Document) {
-        currentDocument = document.copy()
-        _documentIsOpenState.value = true
-    }
-
-    fun closeDocument() {
-        _documentIsOpenState.value = false
+        _openDocumentState.value = document.copy()
     }
 
     fun confirmErrors() {
