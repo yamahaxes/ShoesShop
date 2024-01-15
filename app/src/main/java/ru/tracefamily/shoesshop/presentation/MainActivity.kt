@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -162,7 +163,9 @@ class MainActivity() : ComponentActivity() {
         NavHost(
             navController = navController,
             startDestination = Constants.ProductInfoNavItem.route,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            exitTransition = { ExitTransition.None },
+            popExitTransition = { ExitTransition.None }
         ) {
             composable(route = Constants.ProductInfoNavItem.route) {
                 InfoScreen(Modifier.fillMaxSize(), vm)
